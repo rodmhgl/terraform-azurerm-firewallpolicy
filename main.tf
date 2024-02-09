@@ -1,65 +1,7 @@
-locals {
-  rule_collection = {
-    example-fwpolicy-rcg = {
-      name     = "example-fwpolicy-rcg"
-      priority = 500
-      application_rule_collection = {
-        app_rule_collection_one = {
-          name     = "app_rule_collection1"
-          priority = 500
-          action   = "Deny"
-          app_rule_collection1_rule1 = {
-            protocols = {
-              Http = {
-                port = 80
-              }
-              Https = {
-                port = 443
-              }
-            }
-            source_addresses  = ["10.0.0.1"]
-            destination_fqdns = ["*.microsoft.com"]
-          }
-        }
-      }
-      network_rule_collection = {
-        name     = "network_rule_collection1"
-        priority = 400
-        action   = "Deny"
-        rule = {
-          network_rule_collection1_rule1 = {
-            protocols             = ["TCP", "UDP"]
-            source_addresses      = ["10.0.0.1"]
-            destination_addresses = ["192.168.1.1", "192.168.1.2"]
-            destination_ports     = ["80", "1000-2000"]
-          }
-        }
-      }
-      nat_rule_collection = {
-        nat_rule_collection1 = {
-          priority = 300
-          action   = "Dnat"
-          rule = {
-            nat_rule_collection1_rule1 = {
-              protocols           = ["TCP", "UDP"]
-              source_addresses    = ["10.0.0.1", "10.0.0.2"]
-              destination_address = "192.168.1.1"
-              destination_ports   = ["80"]
-              translated_address  = "192.168.0.1"
-              translated_port     = "8080"
-            }
-          }
-        }
-    } }
-  }
+locals {   
   rule_collections      = yamlencode(local.rule_collection)
   yaml_rule_collections = yamldecode(file("${path.module}/rule_collections.yml"))
 }
-
-# resource "local_file" "yaml" {
-#   filename = "./rule_collections.yml"
-#   content  = local.rule_collections
-# }
 
 resource "azurerm_resource_group" "this" {
   name     = var.resource_group_name
@@ -67,14 +9,10 @@ resource "azurerm_resource_group" "this" {
   tags     = var.tags
 }
 
-data "azurerm_resource_group" "this" {
-  name = azurerm_resource_group.this.name
-}
-
 resource "azurerm_firewall_policy" "parent" {
   name                     = var.name
-  resource_group_name      = data.azurerm_resource_group.this.name
-  location                 = data.azurerm_resource_group.this.location
+  resource_group_name      = azurerm_resource_group.this.name
+  location                 = azurerm_resource_group.this.location
   sku                      = "Standard"
   threat_intelligence_mode = "Alert"
 }
