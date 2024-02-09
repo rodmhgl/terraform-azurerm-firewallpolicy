@@ -1,0 +1,92 @@
+---
+rule_collection_groups:
+  example-fwpolicy-rcg:
+    priority: 500
+    application_rule_collections:
+      outbound_defender_for_cloud:
+        priority: 500
+        action: Allow
+        rules:
+          allow_mdc_urls:
+            protocols:
+              Https:
+                port: 443
+            source_addresses:
+              - "*"
+            destination_fqdns:
+              - adaproddiscovery.azureedge.net
+              - "*.s-microsoft.com"
+              - "*.msecnd.net"
+              - dev.virtualearth.net
+              - flow.microsoft.com
+              - static2.sharepointonline.com
+              - "*.blob.core.windows.net"
+              - "*.us.portal.cloudappsecurity.com"
+              - "*.us2.portal.cloudappsecurity.com"
+              - "*.us3.portal.cloudappsecurity.com"
+              - "*.cas.ms"
+              - "*.mcas.ms"
+              - "*.admin-mcas.ms"
+      azure_required_fqdn_tags:
+        priority: 600
+        action: Deny
+        rules:
+          azure_required_fqdn_tags:
+            protocols:
+              Https:
+                port: 443
+            source_addresses:
+              - "*"
+            destination_fqdn_tags:
+              - AzureKubernetesService
+              - WindowsUpdate
+              - WindowsDiagnostics
+              - MicrosoftActiveProtectionService
+              - AzureBackup
+    network_rule_collections:
+        network_rule_collection_one:
+          priority: 400
+          action: Deny
+          rules:
+            network_rule_collection1_rule1:
+              source_addresses:
+                - 10.0.0.1
+              destination_addresses:
+                - 192.168.1.1
+                - 192.168.1.2
+              destination_ports:
+                - 80
+                - 443
+              protocols:
+                - TCP
+                - UDP
+        network_rule_collection_two:
+          priority: 700
+          action: Deny
+          rules:
+            network_rule_collection2_rule1:
+              source_addresses:
+                - "*"
+              destination_addresses:
+                - "*"
+              destination_ports:
+                - 80
+                - 443
+              protocols:
+                - Any
+    nat_rule_collections:
+      nat_rule_collection_one:
+        priority: 300
+        action: Dnat
+        rules:
+          nat_rule_collection1_rule1:
+            protocols:
+              - TCP
+              - UDP
+            source_addresses:
+              - "*"
+            translated_address: 10.0.0.1
+            translated_port: 8000
+            destination_address: 10.0.0.2
+            destination_ports:
+              - 443
