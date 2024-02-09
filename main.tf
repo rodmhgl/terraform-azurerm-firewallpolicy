@@ -1,5 +1,4 @@
 locals {   
-  rule_collections      = yamlencode(local.rule_collection)
   yaml_rule_collections = yamldecode(file("${path.module}/rule_collections.yml"))
 }
 
