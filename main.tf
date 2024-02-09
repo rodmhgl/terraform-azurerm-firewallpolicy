@@ -104,20 +104,3 @@ resource "azurerm_firewall_policy_rule_collection_group" "this" {
     }
   }
 }
-
-# resource "azurerm_firewall_policy" "child" {
-#   name                     = "child-fwp"
-#   resource_group_name      = data.azurerm_resource_group.this.name
-#   location                 = data.azurerm_resource_group.this.location
-#   base_policy_id           = azurerm_firewall_policy.parent.id
-#   sku                      = "Standard"
-#   threat_intelligence_mode = "Alert"
-# }
-
-# output "rule_collections" {
-#   value = local.rule_collections
-# }
-
-# output "yaml_rule_collections" {
-#   value = local.yaml_rule_collections
-# }
